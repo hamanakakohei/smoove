@@ -1,0 +1,32 @@
+#!/bin/bash
+#$ -S /bin/bash
+#$ -N smoove_03
+#$ -cwd
+#$ -q aaa.q
+#$ -pe OpenMP 4
+#$ -l s_vmem=8G
+#$ -o logs/03/$TASK_ID.log
+#$ -e logs/03/$TASK_ID.log
+
+set -euo pipefail
+
+
+# 位置引数
+SAMPLE_FILE=$1
+REF=$2
+SITE_VCF=$3
+
+
+# サンプル名とCRAMパス
+read SAMPLE CRAM < <(sed -n "${SGE_TASK_ID}p" "$SAMPLE_FILE")
+
+
+# 実行
+mkdir -p logs/03
+
+bash scripts/03_smoove_genotype.sh \
+  --ref "$REF" \
+  --cram "$CRAM" \
+  --site_vcf "$SITE_VCF" \
+  --sample "$SAMPLE" \
+  --threads "$NSLOTS"

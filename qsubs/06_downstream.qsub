@@ -1,0 +1,31 @@
+#!/bin/bash
+#$ -S /bin/bash
+#$ -N smoove_06
+#$ -cwd
+#$ -q centauri.q
+#$ -pe OpenMP 4
+#$ -l s_vmem=8G
+#$ -o logs/06/$TASK_ID.log
+#$ -e logs/06/$TASK_ID.log
+
+set -euo pipefail
+
+
+# 位置引数
+COHORT_VCF=$1
+PROBAND_LIST=$2
+PED=$3
+CTRL_AF=$4
+
+
+# Proband名
+mkdir -p logs/06
+read PROBAND < <(sed -n "${SGE_TASK_ID}p" "$PROBAND_LIST")
+
+
+# 実行
+scripts/06_downstream.sh \
+  --cohort_vcf $COHORT_VCF \
+  --proband $PROBAND \
+  --ped $PED \
+  --ctrl_af $CTRL_AF

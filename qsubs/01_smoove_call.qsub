@@ -1,0 +1,37 @@
+#!/bin/bash
+#$ -S /bin/bash
+#$ -N smoove_01
+#$ -cwd
+#$ -q aaa.q
+#$ -pe OpenMP 4
+#$ -l s_vmem=8G
+#$ -o logs/01/$TASK_ID.log
+#$ -e logs/01/$TASK_ID.log
+
+set -euo pipefail
+
+
+# 位置引数
+SAMPLE_FILE=$1
+REF=$2
+EXCLUDE=$3
+
+
+# サンプル名とCRAMパス
+read SAMPLE CRAM < <(sed -n "${SGE_TASK_ID}p" "$SAMPLE_FILE")
+
+echo $SAMPLE_FILE
+echo $REF
+echo $EXCLUDE
+echo $SAMPLE
+echo $CRAM
+
+# 実行
+mkdir -p logs/01
+
+bash scripts/01_smoove_call.sh \
+  --ref "$REF" \
+  --exclude "$EXCLUDE" \
+  --cram "$CRAM" \
+  --sample "$SAMPLE" \
+  --threads "$NSLOTS"
